@@ -5,7 +5,7 @@ from collections import defaultdict
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from redis import Redis
+
 
 app = FastAPI()
 
