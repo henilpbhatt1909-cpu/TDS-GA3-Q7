@@ -1,11 +1,9 @@
 
-import os
 from collections import defaultdict
 
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-
 
 app = FastAPI()
 
@@ -19,17 +17,6 @@ app.add_middleware(
 API_KEY = "ak_qckgst9a4pvvefy7c0gbumki"
 EMAIL = "24f2005969@ds.study.iitm.ac.in"
 
-redis_url = os.getenv("REDIS_URL")
-
-if redis_url:
-    r = Redis.from_url(redis_url, decode_responses=True)
-else:
-    r = Redis(
-        host=os.getenv("REDIS_HOST", "redis"),
-        port=6379,
-        decode_responses=True
-    )
-
 
 class Event(BaseModel):
     user: str
@@ -39,26 +26,6 @@ class Event(BaseModel):
 
 class AnalyticsRequest(BaseModel):
     events: list[Event]
-
-
-@app.get("/healthz")
-def health():
-    try:
-        r.ping()
-        return {"status": "ok", "redis": "up"}
-    except Exception:
-        raise HTTPException(status_code=503, detail="Redis unavailable")
-
-
-@app.post("/hit/{key}")
-def hit(key: str):
-    return {"key": key, "count": r.incr(key)}
-
-
-@app.get("/count/{key}")
-def count(key: str):
-    value = r.get(key)
-    return {"key": key, "count": int(value) if value else 0}
 
 
 @app.post("/analytics")
